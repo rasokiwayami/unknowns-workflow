@@ -1,0 +1,26 @@
+project:
+  name: unknowns-workflow
+  repository: rasokiwayami/unknowns-workflow # Update when forking.
+  visibility: public
+  type: public_skill_package
+  domain: agent_assisted_implementation
+  primary_goal: Publish a portable workflow for finding, classifying, and handling unknowns before, during, and after implementation.
+
+authority:
+  local_edit: allowed
+  public_push: allowed after verification and independent review
+  forbidden:
+    - secrets or credentials
+    - private workspace names or internal policy names
+    - raw private evidence
+    - unsupported public claims
+
+verification:
+  default:
+    - git diff --check
+    - find . -type f -not -path './.git/*' -maxdepth 4 -print
+
+layout:
+  skills: skills/
+  docs: docs/
+  templates: templates/
