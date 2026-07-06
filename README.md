@@ -1,6 +1,11 @@
 # unknowns-workflow
 
-[日本語の紹介](docs/ja.md)
+AI agents often fail because they start implementing before the real unknowns
+are visible. `unknowns-workflow` gives the agent a small operating loop for
+finding those unknowns, resolving the ones that matter, and logging what the
+real codebase teaches during implementation.
+
+日本語で読みたい場合は [日本語の紹介](docs/ja.md) からどうぞ。まず試すなら [Copy-Paste Prompt](#copy-paste-prompt) をAIに貼ってください。
 
 `unknowns-workflow` is a portable workflow for agent-assisted implementation.
 It helps an agent find what the prompt, plan, and operator do not know yet
@@ -118,12 +123,41 @@ Use only the files that fit the operation.
 Copy any skill folder from `skills/` into your agent's skill directory, or
 reference the skill text directly in your workflow prompts.
 
-For Codex-style skill directories, the structure is:
+For agent skill directories that use a named folder layout, the structure is:
 
 ```text
 skills/
   finding-unknowns/
     SKILL.md
+```
+
+## Copy-Paste Prompt
+
+Use this when you want an agent to apply the workflow without installing the
+skills first:
+
+```text
+Before implementing, run an unknowns pass.
+
+Classify the work into:
+- Known Knowns
+- Known Unknowns
+- Unknown Knowns
+- Unknown Unknowns
+
+Declare familiarity as new, partial, or known. If the area is unfamiliar,
+teach me the likely blindspots before planning. If the success criteria are
+implicit, give me a few concrete options to react to before editing code. If
+named decisions remain, ask only the questions that would change architecture,
+scope, or user-visible behavior.
+
+During implementation, keep implementation notes. If the real codebase forces
+you to deviate from the plan, choose the conservative option and log:
+- Expected
+- Found
+- Chosen conservative option
+- Why conservative
+- Follow-up needed
 ```
 
 ## Optional Automation Gates
