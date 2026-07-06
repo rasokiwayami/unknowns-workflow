@@ -1,5 +1,7 @@
 # unknowns-workflow
 
+[日本語の紹介](docs/ja.md)
+
 `unknowns-workflow` is a portable workflow for agent-assisted implementation.
 It helps an agent find what the prompt, plan, and operator do not know yet
 before code is changed, capture what the real implementation teaches during
