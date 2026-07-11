@@ -88,6 +88,104 @@ AIにコードを書かせるとき、失敗の原因は「AIの実装力が低�
 
 単純な誤字修正や、1行だけの明らかな修正には大げさです。そういう場合は普通に直せば十分です。
 
+## 導入方法
+
+### ローカルプラグインマーケットプレイス
+
+このリポジトリを、8つのスキルをすべてまとめた1つのローカルプラグインとしてインストールできます。リポジトリをローカルの安定したパスにクローンまたは配置し、そのルートディレクトリから以下を実行します。
+
+```bash
+codex plugin marketplace add .
+codex plugin add unknowns-workflow@unknowns-workflow-local
+```
+
+マーケットプレイスを登録したら、ChatGPT デスクトップアプリを再起動してください。また、**Plugins**を開き、**Unknowns Workflow Local**を選択して `unknowns-workflow` をインストールすることもできます。インストール後に新しいタスクを開始すると、Codex がバンドルされたスキルを検出します。必要に応じて以下のように明示的に呼び出してください。
+
+```text
+$finding-unknowns
+```
+
+ローカルのチェックアウトを更新し、キャッシュされたプラグインを再インストールするには：
+
+```bash
+git pull
+codex plugin marketplace upgrade unknowns-workflow-local
+codex plugin add unknowns-workflow@unknowns-workflow-local
+```
+
+チェックアウト先を移動した場合は、古いマーケットプレイス登録を削除し、新しいリポジトリパスを追加してから再インストールしてください。
+
+```bash
+codex plugin marketplace remove unknowns-workflow-local
+codex plugin marketplace add /new/path/to/unknowns-workflow
+codex plugin add unknowns-workflow@unknowns-workflow-local
+```
+
+※このマーケットプレイスはローカル専用です。プラグインを公開したり、パブリックなプラグインディレクトリに登録したりすることはありません。
+
+### スキルの直接インストール
+
+より軽量なセットアップとして、`skills/` から任意のスキルフォルダをエージェントのスキルディレクトリにコピーするか、スキルのテキストをワークフローのプロンプト内に直接参照させることも可能です。
+
+名前付きフォルダ構成を使用するエージェントスキルディレクトリの場合、構造は以下のようになります。
+
+```text
+skills/
+  finding-unknowns/
+    SKILL.md
+```
+
+## コピペ用プロンプト
+
+スキルを事前にインストールせずに、エージェントにこのワークフローを適用させたい場合は、以下のプロンプトを使用してください（日本語または英語のいずれかで指示できます）。
+
+```text
+Before implementing, run an unknowns pass.
+
+Classify the work into:
+- Known Knowns
+- Known Unknowns
+- Unknown Knowns
+- Unknown Unknowns
+
+Declare familiarity as new, partial, or known. If the area is unfamiliar,
+teach me the likely blindspots before planning. If the success criteria are
+implicit, give me a few concrete options to react to before editing code. If
+named decisions remain, ask only the questions that would change architecture,
+scope, or user-visible behavior.
+
+During implementation, keep implementation notes. If the real codebase forces
+you to deviate from the plan, choose the conservative option and log:
+- Expected
+- Found
+- Chosen conservative option
+- Why conservative
+- Follow-up needed
+```
+
+（日本語訳の指示例：）
+```text
+実装に入る前に、unknowns パスを実行してください。
+
+作業内容を以下に分類してください：
+- Known Knowns（既知の既知）
+- Known Unknowns（既知の未知）
+- Unknown Knowns（未知の既知）
+- Unknown Unknowns（未知の未知）
+
+この領域への習熟度（familiarity）を new（新規）、partial（一部知っている）、known（既知）のいずれかで宣言してください。
+もし不慣れな領域（new）であれば、計画を立てる前に起こりうるブラインドスポット（盲点）を教えてください。
+もし成功基準が暗黙的であれば、コードを修正する前に、私が判断できるような具体的な選択肢をいくつか提示してください。
+未決の決定事項が残っている場合は、アーキテクチャ、スコープ、またはユーザーに見える挙動を変更するような重要な質問のみを厳選して聞いてください。
+
+実装中は、implementation-notes.md（実装ノート）を記録してください。もし実際のコードベースの状況によって計画から逸脱（deviate）せざるを得なくなった場合は、保守的な選択肢を採用し、以下を記録してください：
+- Expected（想定していた挙動・設計）
+- Found（実際に発見したコードベースの状況）
+- Chosen conservative option（採用した保守的な選択肢）
+- Why conservative（なぜそれが保守的と言えるのか）
+- Follow-up needed（必要なフォローアップ・今後の課題）
+```
+
 ## ひとことで言うと
 
 `unknowns-workflow` は、AIに実装させる前に「何を知らないまま進もうとしているのか」を見つけるための道具です。
