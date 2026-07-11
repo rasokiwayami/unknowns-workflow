@@ -1,0 +1,31 @@
+{
+  "name": "unknowns-workflow",
+  "version": "0.1.0",
+  "description": "Find and handle unknowns before, during, and after agent-assisted implementation.",
+  "author": {
+    "name": "rasokiwayami",
+    "url": "https://github.com/rasokiwayami"
+  },
+  "repository": "https://github.com/rasokiwayami/unknowns-workflow",
+  "license": "MIT",
+  "keywords": [
+    "agent-workflow",
+    "implementation",
+    "unknowns"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Unknowns Workflow",
+    "shortDescription": "Find implementation unknowns before they become rework.",
+    "longDescription": "Classify unknowns before implementation, capture deviations during implementation, and turn the results into reusable learning artifacts.",
+    "developerName": "rasokiwayami",
+    "category": "Developer Tools",
+    "capabilities": [
+      "Write"
+    ],
+    "websiteURL": "https://github.com/rasokiwayami/unknowns-workflow",
+    "defaultPrompt": [
+      "Run an unknowns pass before implementing this change."
+    ]
+  }
+}
