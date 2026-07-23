@@ -141,6 +141,6 @@ runtime or provider details.
 
 ## Review status
 
-Implementation verification is complete. A separate final read-only Review
-Controller verdict remains pending. No push, publication, deployment,
-submission, authentication, or external action has been performed.
+Implementation verification is complete. A separate final read-only review
+verdict remains pending. No push, publication, deployment, submission,
+authentication, or external action has been performed.
