@@ -131,6 +131,21 @@ skills/
     SKILL.md
 ```
 
+The optional local harness is an installable Python package:
+
+```bash
+python3 -m pip install .
+unknowns-harness preflight \
+  --manifest examples/capabilities-missing.json \
+  --require ledger \
+  --require implementation_notes
+```
+
+The demo exits with status `2` and prints a typed `missing_capability`
+rejection with a local remedy. The preflight is observational only: it does
+not authorize effects, issue tokens, transfer authority, or try a hidden
+fallback.
+
 ## Copy-Paste Prompt
 
 Use this when you want an agent to apply the workflow without installing the
@@ -175,7 +190,7 @@ unknowns, resolve what matters, log deviations, and teach the result.
 
 ## Status
 
-Initial public extraction. No CLI is included in this first slice.
+Initial public extraction with a minimal capability-preflight CLI.
 
 ## License
 
