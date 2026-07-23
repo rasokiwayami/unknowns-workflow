@@ -141,6 +141,15 @@ runtime or provider details.
 
 ## Review status
 
-Implementation verification is complete. A separate final read-only review
-verdict remains pending. No push, publication, deployment, submission,
-authentication, or external action has been performed.
+Final independent review approved the cumulative changes from `13ab2f7`
+through `5bdab37`. The reviewer confirmed the 45-test suite, clean-archive
+installation, both demos, sanitization, and review-evidence integrity checks,
+with no Critical or Important findings.
+
+One optional follow-up remains: the direct
+`check_capabilities(required='ledger')` API could explicitly reject bare
+`str` and `bytes` inputs instead of treating them as iterables. This is not a
+finding against the documented CLI or manifest path.
+
+No push, publication, deployment, submission, authentication, or external
+action has been performed.
