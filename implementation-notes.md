@@ -1,4 +1,4 @@
-# Unknowns Workflow Harness — WO-5/WO-6 Implementation Record
+# Unknowns Workflow Harness — Implementation Record
 
 ## Goal
 
