@@ -138,10 +138,10 @@ Unknowns skills listed above, six reusable templates, and the public
 documentation for running the workflow manually. Those remain usable without
 installing Python code.
 
-### What WO-5 and WO-6 add
+### What the harness adds
 
-WO-5 and WO-6 add the installable `unknowns_harness` Python package and its
-local test suite. The package provides:
+The harness adds the installable `unknowns_harness` Python package and its local
+test suite. The package provides:
 
 - capability preflight and typed rejections;
 - structured telemetry and deterministic semantic fingerprints;
