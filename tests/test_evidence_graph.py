@@ -1,7 +1,10 @@
 import json
 import multiprocessing
+import os
+import stat
 import tempfile
 import unittest
+from unittest.mock import patch
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
@@ -74,6 +77,104 @@ class EvidenceGraphTests(unittest.TestCase):
         self.assertEqual(stored[-1], second)
         self.assertTrue(raw.endswith(b"\n"))
         self.assertTrue(all(event["authoritative"] is False for event in stored))
+
+    def test_new_stream_fsyncs_file_and_containing_directory(self) -> None:
+        fsync_kinds: list[str] = []
+
+        def observe_fsync(file_descriptor: int) -> None:
+            mode = os.fstat(file_descriptor).st_mode
+            fsync_kinds.append(
+                "directory" if stat.S_ISDIR(mode) else "file" if stat.S_ISREG(mode) else "other"
+            )
+
+        with tempfile.TemporaryDirectory() as directory:
+            with patch(
+                "unknowns_harness.evidence_graph.os.fsync",
+                side_effect=observe_fsync,
+            ):
+                append_event(
+                    root=directory,
+                    stream_id="fsync-observed",
+                    kind="observation",
+                    subject="input",
+                    producer="worker",
+                )
+
+        self.assertEqual(fsync_kinds, ["file", "directory"])
+
+    def test_symlinked_evidence_directory_is_rejected_without_external_writes(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "root"
+            outside = Path(directory) / "outside"
+            root.mkdir()
+            outside.mkdir()
+            (root / "evidence").symlink_to(outside)
+
+            with self.assertRaisesRegex(EvidenceGraphError, "path_symlink"):
+                append_event(
+                    root=root,
+                    stream_id="escaped",
+                    kind="observation",
+                    subject="input",
+                    producer="worker",
+                )
+
+            self.assertEqual(list(outside.iterdir()), [])
+
+    def test_symlinked_lock_path_is_rejected_without_stream_write(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "root"
+            evidence = root / "evidence"
+            evidence.mkdir(parents=True)
+            outside_lock = Path(directory) / "outside.lock"
+            outside_lock.write_bytes(b"sentinel")
+            (evidence / "locked.lock").symlink_to(outside_lock)
+
+            with self.assertRaisesRegex(EvidenceGraphError, "path_symlink"):
+                append_event(
+                    root=root,
+                    stream_id="locked",
+                    kind="observation",
+                    subject="input",
+                    producer="worker",
+                )
+
+            self.assertEqual(outside_lock.read_bytes(), b"sentinel")
+            self.assertFalse((evidence / "locked.jsonl").exists())
+
+    def test_symlinked_stream_path_is_rejected_without_target_write(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "root"
+            evidence = root / "evidence"
+            evidence.mkdir(parents=True)
+            outside_stream = Path(directory) / "outside.jsonl"
+            outside_stream.write_bytes(b"")
+            (evidence / "linked.jsonl").symlink_to(outside_stream)
+
+            with self.assertRaisesRegex(EvidenceGraphError, "path_symlink"):
+                append_event(
+                    root=root,
+                    stream_id="linked",
+                    kind="observation",
+                    subject="input",
+                    producer="worker",
+                )
+
+            self.assertEqual(outside_stream.read_bytes(), b"")
+
+    def test_read_rejects_stream_symlink_without_reading_target(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory) / "root"
+            evidence = root / "evidence"
+            evidence.mkdir(parents=True)
+            outside_stream = Path(directory) / "outside.jsonl"
+            outside_stream.write_bytes(b"untrusted")
+            (evidence / "read-linked.jsonl").symlink_to(outside_stream)
+
+            with self.assertRaisesRegex(EvidenceGraphError, "path_symlink"):
+                read_events(root=root, stream_id="read-linked")
+
+            self.assertEqual(outside_stream.read_bytes(), b"untrusted")
 
     def test_concurrent_distinct_and_duplicate_appends_are_serialized(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -218,10 +319,62 @@ class EvidenceGraphTests(unittest.TestCase):
             with self.assertRaisesRegex(EvidenceGraphError, "future_event"):
                 read_events(root=directory, stream_id="future-read")
 
+    def test_read_rejects_unknown_schema_version_and_kind(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            for stream_id, field, value, error in (
+                ("unknown-version", "schema_version", 2, "schema_version_closed"),
+                ("unknown-kind", "kind", "permission", "kind_closed"),
+            ):
+                event = append_event(
+                    root=directory,
+                    stream_id=stream_id,
+                    kind="observation",
+                    subject="input",
+                    producer="worker",
+                )
+                event[field] = value
+                path = graph_path(root=directory, stream_id=stream_id)
+                path.write_text(
+                    json.dumps(event, sort_keys=True) + "\n",
+                    encoding="utf-8",
+                )
+                with self.assertRaisesRegex(EvidenceGraphError, error):
+                    read_events(root=directory, stream_id=stream_id)
+
+    def test_read_rejects_permission_effect_and_token_fields(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            for extra_field in ("permission", "effect", "token"):
+                stream_id = f"extra-{extra_field}"
+                event = append_event(
+                    root=directory,
+                    stream_id=stream_id,
+                    kind="observation",
+                    subject="input",
+                    producer="worker",
+                )
+                event[extra_field] = "injected"
+                path = graph_path(root=directory, stream_id=stream_id)
+                path.write_text(
+                    json.dumps(event, sort_keys=True) + "\n",
+                    encoding="utf-8",
+                )
+                with self.assertRaisesRegex(EvidenceGraphError, "schema_invalid"):
+                    read_events(root=directory, stream_id=stream_id)
+
     def test_adjudication_counts_equal_decisions_and_exact_directions(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             for index, (baseline, shadow) in enumerate(
-                (("allow", "allow"), ("allow", "deny"), ("error", "allow"))
+                (
+                    ("allow", "allow"),
+                    ("deny", "deny"),
+                    ("error", "error"),
+                    ("allow", "deny"),
+                    ("allow", "error"),
+                    ("deny", "allow"),
+                    ("deny", "error"),
+                    ("error", "allow"),
+                    ("error", "deny"),
+                )
             ):
                 append_event(
                     root=directory,
@@ -235,12 +388,19 @@ class EvidenceGraphTests(unittest.TestCase):
             events = read_events(root=directory, stream_id="exposures")
             report = adjudicate_exposures(events)
 
-        self.assertEqual(report["exposure_count"], 3)
-        self.assertEqual(report["agreement_count"], 1)
+        self.assertEqual(report["exposure_count"], 9)
+        self.assertEqual(report["agreement_count"], 3)
         self.assertAlmostEqual(report["agreement_rate"], 1 / 3)
         self.assertEqual(
             report["disagreement_directions"],
-            {"allow->deny": 1, "error->allow": 1},
+            {
+                "allow->deny": 1,
+                "allow->error": 1,
+                "deny->allow": 1,
+                "deny->error": 1,
+                "error->allow": 1,
+                "error->deny": 1,
+            },
         )
         self.assertIs(report["authoritative"], False)
         self.assertTrue(all(event["authoritative"] is False for event in events))

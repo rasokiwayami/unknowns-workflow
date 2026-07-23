@@ -86,13 +86,21 @@ def semantic_fingerprint(
 
     excluded = list(volatile_names)
     if root is not None:
-        root_path = Path(root).expanduser().resolve()
+        root_input = Path(root).expanduser()
+        if root_input.is_symlink():
+            raise FingerprintInputError("path_symlink")
+        root_path = root_input.resolve()
         if not root_path.is_dir():
             raise FingerprintInputError("root_invalid")
         for name in path_names:
             if name in volatile_names:
                 continue
-            candidate = (root_path / name).resolve()
+            candidate = root_path
+            for component in Path(name).parts:
+                candidate /= component
+                if candidate.is_symlink():
+                    raise FingerprintInputError("path_symlink")
+            candidate = candidate.resolve()
             try:
                 candidate.relative_to(root_path)
             except ValueError as exc:

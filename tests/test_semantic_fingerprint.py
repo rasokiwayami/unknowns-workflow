@@ -67,8 +67,19 @@ class SemanticFingerprintTests(unittest.TestCase):
             outside = Path(directory) / "outside.txt"
             outside.write_text("private\n", encoding="utf-8")
             (root / "escape").symlink_to(outside)
+            (root / "target.txt").write_text("public\n", encoding="utf-8")
+            (root / "in-root-link").symlink_to(root / "target.txt")
+            (root / "real").mkdir()
+            (root / "real" / "nested.txt").write_text("nested\n", encoding="utf-8")
+            (root / "linked-directory").symlink_to(root / "real")
 
-            for unsafe in ("../outside.txt", "/tmp/outside.txt", "escape"):
+            for unsafe in (
+                "../outside.txt",
+                "/tmp/outside.txt",
+                "escape",
+                "in-root-link",
+                "linked-directory/nested.txt",
+            ):
                 with self.subTest(unsafe=unsafe):
                     with self.assertRaises(FingerprintInputError):
                         semantic_fingerprint(root=root, paths=(unsafe,))

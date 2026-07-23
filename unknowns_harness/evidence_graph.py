@@ -55,10 +55,37 @@ def _safe_text(value: str, label: str) -> str:
     return value
 
 
-def graph_path(*, root: str | Path, stream_id: str) -> Path:
+def _reject_symlink(path: Path) -> None:
+    if path.is_symlink():
+        raise EvidenceGraphError("path_symlink")
+
+
+def _graph_paths(
+    *, root: str | Path, stream_id: str
+) -> tuple[Path, Path]:
     if not isinstance(root, (str, Path)):
         raise EvidenceGraphError("root_invalid")
-    return Path(root).expanduser().resolve() / "evidence" / f"{_safe_id(stream_id, 'stream_id')}.jsonl"
+    root_input = Path(root).expanduser()
+    _reject_symlink(root_input)
+    root_path = root_input.resolve()
+    evidence_dir = root_path / "evidence"
+    stream_path = evidence_dir / f"{_safe_id(stream_id, 'stream_id')}.jsonl"
+    lock_path = stream_path.with_suffix(".lock")
+    try:
+        evidence_dir.relative_to(root_path)
+        stream_path.relative_to(evidence_dir)
+        lock_path.relative_to(evidence_dir)
+    except ValueError as exc:
+        raise EvidenceGraphError("path_escape") from exc
+    for path in (evidence_dir, stream_path, lock_path):
+        _reject_symlink(path)
+    if evidence_dir.exists() and not evidence_dir.is_dir():
+        raise EvidenceGraphError("evidence_directory_invalid")
+    return stream_path, lock_path
+
+
+def graph_path(*, root: str | Path, stream_id: str) -> Path:
+    return _graph_paths(root=root, stream_id=stream_id)[0]
 
 
 def _canonical(value: object) -> bytes:
@@ -208,7 +235,11 @@ def _lock(path: Path, timeout_seconds: float):
         or timeout_seconds > MAX_LOCK_SECONDS
     ):
         raise EvidenceGraphError("lock_timeout_invalid")
+    _reject_symlink(path.parent)
+    _reject_symlink(path)
     path.parent.mkdir(parents=True, exist_ok=True)
+    _reject_symlink(path.parent)
+    _reject_symlink(path)
     handle = path.open("a+b")
     deadline = time.monotonic() + timeout_seconds
     while True:
@@ -277,8 +308,8 @@ def append_event(
     if produced > datetime.now(timezone.utc):
         raise EvidenceGraphError("future_event")
 
-    path = graph_path(root=root, stream_id=stream_id)
-    lock_handle = _lock(path.with_suffix(".lock"), lock_timeout_seconds)
+    path, lock_path = _graph_paths(root=root, stream_id=stream_id)
+    lock_handle = _lock(lock_path, lock_timeout_seconds)
     try:
         existing = _read_stream(path, stream_id)
         candidate: dict[str, object] = {
@@ -313,6 +344,8 @@ def append_event(
             now=datetime.now(timezone.utc),
         )
         path.parent.mkdir(parents=True, exist_ok=True)
+        _reject_symlink(path.parent)
+        _reject_symlink(path)
         created = not path.exists()
         with path.open("ab") as handle:
             handle.write(_canonical(candidate) + b"\n")
