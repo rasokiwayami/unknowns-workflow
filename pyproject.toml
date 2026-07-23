@@ -11,6 +11,7 @@ license = "MIT"
 
 [project.scripts]
 unknowns-harness = "unknowns_harness.cli:main"
+workflow = "unknowns_harness.workflow_cli:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
