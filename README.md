@@ -233,6 +233,8 @@ The workflow works manually, but teams can automate it:
 
 These gates are optional. The portable workflow is the habit: classify
 unknowns, resolve what matters, log deviations, and teach the result.
+Reviews can use the [proportional review contract](docs/review-contract.md) and
+its optional immutable-artifact provenance check.
 
 ## Status
 
