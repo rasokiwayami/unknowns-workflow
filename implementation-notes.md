@@ -365,11 +365,18 @@ rather than by care.
   focused tests; the combined local run contains 74 tests with clean output.
 - Evaluation artifacts remain local-only, as directed by SA-1. No evaluation
   conclusion was added to the README, as directed by SA-2.
-- W5-0 and W5a are complete without model use. W5b and W6 model sessions have
-  not started. Two attempts to start the required independent worker ended
-  before model use because the service returned a temporary availability error
-  and then a concurrency-limit error. Session use is therefore W5: 0 and W6: 0.
-  No route-quality conclusion is claimed.
+- W5-0 and W5a completed without model use. W5b then used exactly 5 sessions
+  and passed the frozen single-candidate pilot. W6 used exactly 18 sessions:
+  Stage 1 passed in 9; mandatory Stage 2 completed in 9.
+- W6 did not demonstrate preservation across all eight cases. G04 and G08 were
+  unsupported for both routes because the frozen packet lacked the concrete
+  reference artifact and implementation question those cases required. No
+  material boundary violation was observed, no case was rerun, and no acceptance
+  criterion or candidate was changed after outputs were seen.
+- Direct burden measurement found 195 characters and 3 mandatory artifacts for
+  the current route, versus 419 characters and 2 mandatory artifacts for the
+  lightweight route. The result supports neither general superiority nor a
+  general reduction in total burden.
 
 ## Refactor deviations
 
@@ -411,6 +418,11 @@ rather than by care.
 - Follow-up needed: yes; resume at W5b when independent model sessions are
   available. W6 remains untouched until the W5 stopping rule is satisfied.
 
+Resolution: the temporary service constraint cleared. Evaluation resumed at
+W5b without changing the candidate or packet, then completed the exact 5-session
+W5 and 18-session W6 sequence. No retry was counted as an evaluation session
+because the earlier failures ended before model use.
+
 ### D12: Valid JSON with wrong field types escaped the typed rejection contract
 
 - Expected (plan): Every malformed review record returns deterministic JSON and
@@ -423,3 +435,18 @@ rather than by care.
 - Why conservative: It closes the new public function's own declared contract
   without adding a new layer, dependency, or generalized validator.
 - Follow-up needed: no; the focused 13-test suite and full 74-test suite pass.
+
+### D13: Two frozen cases lacked the concrete evidence their requirements need
+
+- Expected (plan): All eight packet bindings provide enough equal-input evidence
+  to evaluate each case's critical requirement.
+- Found (territory): G04 names a supplied reference artifact but binds no
+  concrete artifact content; G08 names an implementation question but binds no
+  concrete question or relevant repository evidence. Both routes were therefore
+  unsupported on those critical requirements.
+- Chosen conservative option: Complete Stage 2 once, record the unsupported
+  result, and make no preservation or general burden-reduction claim.
+- Why conservative: Editing the packet or rerunning after seeing outputs would
+  violate the frozen evaluation and fit the study to its result.
+- Follow-up needed: yes; any future study must define new, independently frozen
+  fixtures. It must be a new evaluation rather than a rerun of this one.
