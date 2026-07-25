@@ -163,6 +163,34 @@ class ReviewProvenanceTests(unittest.TestCase):
             ),
         )
 
+    def test_json_type_confusion_is_rejected_without_an_exception(self):
+        malformed_records = [
+            record(schema_version=True),
+            record(artifact={"kind": [], "identity": ARTIFACT}),
+            record(verdict=[]),
+            record(
+                findings=[
+                    {
+                        "finding_id": "F1",
+                        "classification": {},
+                        "disposition": "fixed",
+                    }
+                ]
+            ),
+            record(
+                findings=[
+                    {
+                        "finding_id": "F1",
+                        "classification": "advisory",
+                        "disposition": [],
+                    }
+                ]
+            ),
+        ]
+        for malformed in malformed_records:
+            with self.subTest(record=malformed):
+                self.assertFalse(check(malformed).valid)
+
 
 class ReviewSubcommandTests(unittest.TestCase):
     def _write(self, value):
@@ -206,6 +234,24 @@ class ReviewSubcommandTests(unittest.TestCase):
                 ),
                 2,
             )
+
+    def test_well_formed_json_with_wrong_field_types_is_a_typed_rejection(self):
+        path = self._write(record(artifact={"kind": [], "identity": ARTIFACT}))
+        output = StringIO()
+        with redirect_stdout(output):
+            exit_code = cli_main(
+                [
+                    "review",
+                    "--record",
+                    str(path),
+                    "--artifact",
+                    ARTIFACT,
+                    "--allow-route",
+                    "standard-review",
+                ]
+            )
+        self.assertEqual(exit_code, 2)
+        self.assertFalse(json.loads(output.getvalue())["valid"])
 
 
 if __name__ == "__main__":

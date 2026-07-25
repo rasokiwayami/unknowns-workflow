@@ -77,7 +77,8 @@ def check_review_provenance(
         return invalid_review_record_result()
 
     fields(record, TOP_FIELDS, "")
-    if record.get("schema_version") != 1:
+    schema_version = record.get("schema_version")
+    if type(schema_version) is not int or schema_version != 1:
         reject("schema_version_closed", "schema_version")
     if record.get("route") not in tuple(allowed_routes):
         reject("route_not_allowed", "route")
@@ -98,7 +99,7 @@ def check_review_provenance(
         fields(artifact, ARTIFACT_FIELDS, "artifact.")
         kind = artifact.get("kind")
         identity = artifact.get("identity")
-        length = ARTIFACT_LENGTHS.get(kind)
+        length = ARTIFACT_LENGTHS.get(kind) if isinstance(kind, str) else None
         if (
             length is None
             or not isinstance(identity, str)
@@ -110,7 +111,7 @@ def check_review_provenance(
             reject("artifact_identity_mismatch", "artifact.identity")
 
     verdict = record.get("verdict")
-    if verdict not in VERDICTS:
+    if not isinstance(verdict, str) or verdict not in VERDICTS:
         reject("verdict_closed", "verdict")
 
     findings = record.get("findings")
@@ -134,12 +135,16 @@ def check_review_provenance(
                 seen.add(finding_id)
             classification = finding.get("classification")
             disposition = finding.get("disposition")
-            if classification not in CLASSIFICATIONS:
+            if (
+                not isinstance(classification, str)
+                or classification not in CLASSIFICATIONS
+            ):
                 reject("finding_classification_closed", f"{prefix}.classification")
-            if disposition not in DISPOSITIONS:
+            if not isinstance(disposition, str) or disposition not in DISPOSITIONS:
                 reject("finding_disposition_closed", f"{prefix}.disposition")
             unresolved |= (
                 classification == "blocking"
+                and isinstance(disposition, str)
                 and disposition in {"open", "deferred"}
             )
 

@@ -361,15 +361,15 @@ rather than by care.
 - The public package gained one pure, 152-line review-provenance validator, one
   additive CLI subcommand, and the proportional review contract.
 - The original committed suite remains 45 tests and passes unchanged. The
-  public provenance suite adds 11 tests. The local-only audit suite contains 16
-  focused tests; the combined local run contains 72 tests with clean output.
+  public provenance suite adds 13 tests. The local-only audit suite contains 16
+  focused tests; the combined local run contains 74 tests with clean output.
 - Evaluation artifacts remain local-only, as directed by SA-1. No evaluation
   conclusion was added to the README, as directed by SA-2.
-- W5 and W6 have not started. Two attempts to start the required independent
-  implementation/evaluation worker ended before model use because the service
-  returned a temporary availability error and then a concurrency-limit error.
-  Session use is therefore W5: 0 and W6: 0. No route-quality conclusion is
-  claimed.
+- W5-0 and W5a are complete without model use. W5b and W6 model sessions have
+  not started. Two attempts to start the required independent worker ended
+  before model use because the service returned a temporary availability error
+  and then a concurrency-limit error. Session use is therefore W5: 0 and W6: 0.
+  No route-quality conclusion is claimed.
 
 ## Refactor deviations
 
@@ -410,3 +410,16 @@ rather than by care.
   would violate independence and equal-input evidence requirements.
 - Follow-up needed: yes; resume at W5b when independent model sessions are
   available. W6 remains untouched until the W5 stopping rule is satisfied.
+
+### D12: Valid JSON with wrong field types escaped the typed rejection contract
+
+- Expected (plan): Every malformed review record returns deterministic JSON and
+  the documented nonzero validation status.
+- Found (territory): Boolean schema version values compared equal to integer
+  version 1, while list or object values in closed-vocabulary fields could raise
+  a type error.
+- Chosen conservative option: Add exact type guards at the existing membership
+  checks and two focused tests covering direct validation and the CLI.
+- Why conservative: It closes the new public function's own declared contract
+  without adding a new layer, dependency, or generalized validator.
+- Follow-up needed: no; the focused 13-test suite and full 74-test suite pass.
