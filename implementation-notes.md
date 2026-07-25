@@ -352,3 +352,61 @@ its content entering public history.
 The instruction packet is a local-only input in tier C. It is added to
 `.gitignore` in this phase so that tracking it is prevented deterministically
 rather than by care.
+
+## Refactor implementation status
+
+- The rejected audit machinery was removed from the local-only evaluation
+  surface. The remaining validator checks data shape, frozen-case bindings, and
+  declared stage coverage only.
+- The public package gained one pure, 152-line review-provenance validator, one
+  additive CLI subcommand, and the proportional review contract.
+- The original committed suite remains 45 tests and passes unchanged. The
+  public provenance suite adds 11 tests. The local-only audit suite contains 16
+  focused tests; the combined local run contains 72 tests with clean output.
+- Evaluation artifacts remain local-only, as directed by SA-1. No evaluation
+  conclusion was added to the README, as directed by SA-2.
+- W5 and W6 have not started. Two attempts to start the required independent
+  implementation/evaluation worker ended before model use because the service
+  returned a temporary availability error and then a concurrency-limit error.
+  Session use is therefore W5: 0 and W6: 0. No route-quality conclusion is
+  claimed.
+
+## Refactor deviations
+
+### D9: Active implementation continued after the queued worker was unavailable
+
+- Expected (plan): A separate queued implementation worker completes the
+  remaining phases and returns a formal packet.
+- Found (territory): Two launches ended before model use because the worker
+  service was temporarily unavailable; neither changed the repository.
+- Chosen conservative option: Continue the deterministic local implementation
+  in the active implementation session, while retaining independent review as a
+  separate final role.
+- Why conservative: It avoids waiting on an unrelated transport failure without
+  collapsing implementation and review into one identity.
+- Follow-up needed: yes; final immutable-commit review remains required.
+
+### D10: The staged-line check needed a platform-compatible expression
+
+- Expected (plan): The supplied staged-line command runs unchanged.
+- Found (territory): The local standard text utility interpreted the escaped
+  leading-plus expression differently and returned a syntax error.
+- Chosen conservative option: Select added non-header lines with `awk`, then run
+  the same bounded forbidden-string count.
+- Why conservative: It preserves the exact checked surface and required zero
+  count without adding a hook, scanner, or runtime mechanism.
+- Follow-up needed: no.
+
+### D11: Independent evaluation sessions are temporarily unavailable
+
+- Expected (plan): W5 uses exactly 5 sessions, followed by W6 using 9 or 18
+  sessions according to the frozen stopping rule.
+- Found (territory): The model service rejected both launch attempts before
+  model use, first for temporary availability and then for concurrent-request
+  capacity.
+- Chosen conservative option: Freeze the local data packet and implementation,
+  record zero sessions used, and stop before making any evaluation claim.
+- Why conservative: Reusing the implementer's own output or inventing results
+  would violate independence and equal-input evidence requirements.
+- Follow-up needed: yes; resume at W5b when independent model sessions are
+  available. W6 remains untouched until the W5 stopping rule is satisfied.
