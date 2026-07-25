@@ -149,15 +149,18 @@ runtime or provider details.
 - Follow-up needed: no; characterization tests cover the discovered
   boundaries.
 
-### D4: Support the repository's available Python 3.9 runtime
+### D4: Keep the package minimum at Python 3.10
 
-- Expected (plan): Python 3.10+ and `zip(strict=True)` are available.
-- Found (territory): the required `python3` command is Python 3.9.6.
-- Chosen conservative option: retain the explicit case-count check and use
-  ordinary `zip` for compatibility.
-- Why conservative: it preserves the same validation contract without
-  depending on an unavailable interpreter keyword.
-- Follow-up needed: no.
+- Expected (plan): Package compatibility remains Python 3.10+ as declared by
+  `pyproject.toml` (`requires-python = ">=3.10"`).
+- Found (territory): the system `python3` command is Python 3.9.6, while the
+  project virtual environment provides Python 3.14.5.
+- Chosen conservative option: Treat Python 3.9 as unsupported for package
+  verification and retain the declared Python 3.10 minimum.
+- Why conservative: it keeps this factual record aligned with the package
+  contract without changing compatibility to accommodate an older interpreter.
+- Follow-up needed: no; run package verification with a supported Python 3.10+
+  environment.
 
 ### D5: Preserve direct-file test loading for the audit modules
 

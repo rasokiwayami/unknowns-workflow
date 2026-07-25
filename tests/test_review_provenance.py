@@ -62,6 +62,15 @@ class ReviewProvenanceTests(unittest.TestCase):
         self.assertIn("independence_violated", codes(check(substituted)))
         self.assertTrue(check(substituted, require_independence=False).valid)
 
+    def test_independence_rejects_identifiers_that_differ_only_by_whitespace(self):
+        substituted = record(
+            implementer_id="worker-1",
+            reviewer_id=" worker-1 ",
+        )
+        result = check(substituted)
+        self.assertFalse(result.valid)
+        self.assertIn("independence_violated", codes(result))
+
     def test_open_or_deferred_blocking_finding_cannot_carry_an_approve_verdict(self):
         for disposition in ("open", "deferred"):
             with self.subTest(disposition=disposition):
@@ -234,6 +243,35 @@ class ReviewSubcommandTests(unittest.TestCase):
                 ),
                 2,
             )
+
+    def test_require_independence_rejects_whitespace_only_identifier_substitution(self):
+        path = self._write(
+            record(
+                implementer_id="worker-1",
+                reviewer_id=" worker-1 ",
+            )
+        )
+        output = StringIO()
+        with redirect_stdout(output):
+            exit_code = cli_main(
+                [
+                    "review",
+                    "--record",
+                    str(path),
+                    "--artifact",
+                    ARTIFACT,
+                    "--allow-route",
+                    "standard-review",
+                    "--require-independence",
+                ]
+            )
+        payload = json.loads(output.getvalue())
+        self.assertEqual(exit_code, 2)
+        self.assertFalse(payload["valid"])
+        self.assertIn(
+            "independence_violated",
+            {item["code"] for item in payload["rejections"]},
+        )
 
     def test_well_formed_json_with_wrong_field_types_is_a_typed_rejection(self):
         path = self._write(record(artifact={"kind": [], "identity": ARTIFACT}))

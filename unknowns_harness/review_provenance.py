@@ -89,7 +89,12 @@ def check_review_provenance(
         reject("identifier_invalid", "implementer_id")
     if not _identifier(reviewer):
         reject("identifier_invalid", "reviewer_id")
-    if require_independence and _identifier(implementer) and implementer == reviewer:
+    if (
+        require_independence
+        and _identifier(implementer)
+        and _identifier(reviewer)
+        and implementer.strip() == reviewer.strip()
+    ):
         reject("independence_violated", "reviewer_id")
 
     artifact = record.get("artifact")
