@@ -1,5 +1,6 @@
 .agent/
 .DS_Store
+refactor-instructions.md
 __pycache__/
 *.py[cod]
 *.egg-info/

@@ -98,6 +98,16 @@ runtime or provider details.
 
 ## Deviations
 
+- 2026-07-24 Task 4 live-canary remains blocked before W5/W6. The exact
+  installed binary and generated-schema pins pass, and the stdio controller
+  reaches completed model turns. However, a bounded public local-read emits no
+  `item/commandExecution/requestApproval` under either `untrusted`, explicit
+  `on-request`, or the one Senior Advisor-recommended attempt combining
+  `approvalsReviewer: user` with a requested
+  `sandbox_permissions=require_escalated` tool call. No external effect or
+  workflow pruning occurred. The accepted-read premise now requires replanning
+  and fresh independent planning review; W5/W6 were not started.
+
 ### D1: Public provenance replaces internal launcher/review binding
 
 - Expected (plan): Port the reviewed evidence and consultation behavior while
@@ -139,6 +149,34 @@ runtime or provider details.
 - Follow-up needed: no; characterization tests cover the discovered
   boundaries.
 
+### D4: Support the repository's available Python 3.9 runtime
+
+- Expected (plan): Python 3.10+ and `zip(strict=True)` are available.
+- Found (territory): the required `python3` command is Python 3.9.6.
+- Chosen conservative option: retain the explicit case-count check and use
+  ordinary `zip` for compatibility.
+- Why conservative: it preserves the same validation contract without
+  depending on an unavailable interpreter keyword.
+- Follow-up needed: no.
+
+### D5: Preserve direct-file test loading for the audit modules
+
+- Expected (plan): Import the new parent controller through the package route.
+- Found (territory): The focused test loader imports `runner.py` directly from
+  its file path, so a normal relative import and an unregistered dataclass
+  module would break the existing test route.
+- Chosen conservative option: Keep a small direct-loader import bridge in the
+  runner and register the sibling module before execution; preserve the
+  package import path for normal use.
+- Why conservative: It changes only module loading, keeps the current tests and
+  CLI route intact, and does not add a second runtime behavior path.
+- Follow-up needed: no.
+
+Deviations `D6`–`D8` are recorded under "Lightweight audit operation" below and
+are preserved as the record of why the proportional-review refactor exists.
+Deviations `D9` onward belong to that refactor and are recorded under
+"Refactor deviations".
+
 ## Review status
 
 Final independent review approved the cumulative changes from `13ab2f7`
@@ -153,3 +191,164 @@ finding against the documented CLI or manifest path.
 
 No push, publication, deployment, submission, authentication, or external
 action has been performed.
+
+## Lightweight audit operation
+
+- Baseline branch: `codex/unknowns-workflow-harness-v2`.
+- Baseline HEAD: `148936ac90b2bac961f79401069fae50cc2e14a5`.
+- Baseline tree: `11653800f3bf45f23cc73d03ad6d0b0649a2ec88`.
+- Baseline tests: `python3 -m unittest discover -s tests -v` — 45 tests, exit 0.
+- Known failure prevention: no matched lesson in the available preflight.
+- Dynamic Workflow overlay: single-run coding-debug work-order, max parallelism 1,
+  900-second timeout, one attempt, local runner with manual handoff fallback,
+  schema/verifier quality gates, and workflow-fitness learning.
+- Required development-flow gate: unavailable because the local CLI has no
+  `flow` subcommand; the command returned exit 2 without changing the target.
+- Required overlay compiler: `npm exec -- tsx ...` was attempted and returned
+  exit 1 due to sandbox IPC `EPERM`; the documented direct compiler fallback
+  returned `status: ok`, exit 0, with the same bounded overlay contract.
+- Task 4 deterministic prerequisites: the target-side validator now probes the
+  pinned app-server capability contract, consumes only typed approval frames,
+  validates exported parent receipts, applies exact schema/hash pins, and
+  exposes exact unique target matching without any receipt issuer or store.
+- Task 4 result boundary: paired results have a closed schema and a
+  conjunctive audit-only pruning gate; `keep`, `simplify`, `delete`, `replace`,
+  and `measure` remain distinct, with replacement and retirement-test parity.
+- Task 4 canaries: the old in-memory canary is no longer treated as live
+  evidence. The exact installed `codex` version and selected aggregate schema
+  hash matched, but the eight reviewed individual schema hashes differed, so
+  both capability and live canaries exited 2 with `blocked_tooling` before
+  model use.
+
+### D6: Target receipt issuance moved to the operation-assigned external path
+
+- Expected (plan): The single-run parent controller lives under operation-owned
+  ignored output and the target runner only validates exported receipts.
+- Found (territory): The pre-existing target module issued and HMAC-signed
+  receipts, so it was a false parent boundary.
+- Chosen conservative option: Replace the target module with schema, protocol,
+  context, and exported-receipt validators; keep no receipt key, issuer, or
+  receipt store in tracked target artifacts.
+- Why conservative: It prevents executor-authored or target-authored evidence
+  from being mistaken for launcher provenance and preserves the public repo
+  boundary.
+- Follow-up needed: yes; the operation-owned ignored output parent must be
+  materialized by the owning launcher environment before a live canary can run.
+
+### D7: Exact generated individual schema hashes block the installed tool
+
+- Expected (plan): The pinned installed app-server satisfies the selected and
+  individual reviewed schema hashes.
+- Found (territory): The installed executable reports the exact version and
+  selected aggregate hash, but all eight reviewed individual schema hashes
+  differ from the approved pin.
+- Chosen conservative option: Return nonzero `blocked_tooling` before any model
+  use; do not weaken the hash contract or use a help/string or handwritten
+  schema fallback.
+- Why conservative: The Task 4 stop condition explicitly treats any generated
+  schema drift as a pre-model tooling blocker.
+- Follow-up needed: yes; refresh the reviewed schema pin and planning/review
+  artifacts before rerunning the live gate.
+
+### D8: Dynamic Workflow overlay compiler unavailable in sandbox
+
+- Expected (plan): Compile the single-run overlay with the documented `tsx`
+  command before implementation.
+- Found (territory): `npm exec -- tsx ... compile` failed with sandbox IPC
+  `EPERM`; the direct Node fallback also failed because the TypeScript source
+  imports extensionless `.js` paths.
+- Chosen conservative option: Retain the approved bounded overlay contract in
+  the existing operation artifacts and do not mutate Base Workflow or invent a
+  new overlay runner.
+- Why conservative: It preserves the required timeout, retry, fallback, and
+  verifier boundary without bypassing the overlay compiler gate.
+- Follow-up needed: yes; rerun the approved compiler in an environment that
+  permits its IPC channel before the next implementation attempt.
+
+## Refactor baseline
+
+Recorded before any edit of the proportional-review refactor, under the frozen
+instruction packet's recording rule: normalized command ID, exit status, salient
+count, and a 16-character prefix of the SHA-256 of the command's own output. Raw
+output, absolute paths, and scan patterns are deliberately excluded — the scan
+identities are referenced only as the packet's forbidden-string set.
+
+| ID | Exit | Count | Digest |
+| --- | ---: | --- | --- |
+| `B1` working-tree status | 0 | 1 modified, 4 untracked | `2e9cbf80a7138e85` |
+| `B2` head commit | 0 | `148936ac90b2bac961f79401069fae50cc2e14a5` | — |
+| `B3` head tree | 0 | `11653800f3bf45f23cc73d03ad6d0b0649a2ec88` | — |
+| `B4` branch | 0 | `codex/unknowns-workflow-harness-v2` | — |
+| `B5` whitespace check | 0 | 0 lines | `e3b0c44298fc1c14` |
+| `B6` system interpreter | 0 | Python 3.9.6 | `fd0fd4290ad100ad` |
+| `B7` project virtualenv interpreter | 0 | Python 3.14.5 | `1ef9a497d30d7ff8` |
+| `B8` full suite | 0 | 70 tests, OK | `584862e4f29d0f5f` |
+| `B9` committed suite | 0 | 45 tests, OK | `d92efc4bae48373e` |
+| `B10` audit suite | 0 | 25 tests, OK | `9c47017391b16941` |
+| `B11` validate-cases | 0 | 8 cases | `d3bfaa20247f0f8b` |
+| `B12` validate-inventory | 0 | 41 claims / 41 sources / 8 obligations | `4c6bdcba6cb21ab6` |
+| `B13` preflight help | 0 | 2 options | `0aade7ea9dc877ee` |
+| `B14` phase order | 0 | 7 elements | `807b03c223c794eb` |
+| `B15` tree listing | 0 | 91 files | `c7fcf9381d5ab1f1` |
+| `B16` tracked-tree scan | 1 | 0 matching files | not recorded by rule |
+
+Three `P1` characterization captures anchor the preserved-behavior contract and
+are the comparison target for the final behavior gate:
+
+| ID | Command | Exit | Digest |
+| --- | --- | ---: | --- |
+| `P1-a` | `workflow typed-rejection` as documented in `README.md` | 2 | `b0da9e30e75a4921` |
+| `P1-b` | `workflow adjudication` as documented in `README.md` | 0 | `506913d4b6e2af90` |
+| `P1-c` | `unknowns-harness preflight` over `examples/capabilities-missing.json` | 2 | `590996e83573b567` |
+
+Two baseline observations differ from the values the frozen packet predicted.
+Both are recorded rather than corrected, per the packet's instruction that a
+mismatch is a finding and not a reason to change the command.
+
+1. `B1` reports one more untracked entry than predicted, because the instruction
+   packet itself now sits in the working tree. It is ignored in this phase.
+2. `B16` returns `0` matching tracked files, not the predicted `1`. The predicted
+   match was the license attribution line, which does not in fact contain any
+   member of the forbidden-string set. The final gate therefore requires `0`,
+   which is strictly stricter than the packet's stated threshold.
+
+Test-runner output embeds a wall-clock duration, so `B8`–`B10` digests are not
+stable across repeated runs. Their stable signal is the test count and status;
+the digest is recorded for completeness only. `B11`–`B15` and `P1-a`–`P1-c` are
+deterministic and their digests are directly comparable.
+
+### Pre-refactor content hashes of the untracked audit work
+
+Recorded so each file's pre-refactor state is provably identified without any of
+its content entering public history.
+
+| Path | SHA-256 | LOC |
+| --- | --- | ---: |
+| `evals/lightweight_audit/parent_controller.py` | `844ef1f411ddf4fbb146f492ecdd6ca0bb3d88ac5b8e94235ba9636f3963c907` | 814 |
+| `evals/lightweight_audit/runner.py` | `2566330a6a2dc3ad64d183ba62f020b7461e518ece93947f2125b348af344b80` | 653 |
+| `evals/lightweight_audit/cases.json` | `5ab3f73df141e2ae5f1b4a36e7c1ad36092bbf71ed7e054b8d0c3a672aa71559` | 90 |
+| `evals/lightweight_audit/source_coverage.json` | `62a76dbc95c06fea636d53dfcfbfafc7d223e1bb233ad4572dfbe89743b93132` | 296 |
+| `docs/audits/CANARY_RUNBOOK.md` | `b2b0bc0871b93a5e45cb077d2590383cacae73c416dade069d13fdcf18dd85a3` | 50 |
+| `docs/audits/DELETE_OR_KEEP_TABLE.md` | `2c77f0e137fc3ad5bafbbd80b1f0f1290f5747d0933e140937c31f2363fcfe78` | 68 |
+| `docs/audits/LIGHTWEIGHT_SHADOW_ROUTE.md` | `a3d47d3f9c2ab9b12803efa5c34fa3fdb6d2df75a39fecd98b052c75d47bab15` | 200 |
+| `docs/audits/RESULTS_SCHEMA.md` | `7e3c3b8cb6f5f95f4e526ec362460c32073de29aa2862ecaa6593152cdfa289e` | 74 |
+| `tests/test_lightweight_audit.py` | `942aae21c148a174433f689b21972d9c6a31a6fc6a9a1dcb02f9165860ce0521` | 539 |
+
+### Untracked-file classification and tracking tier
+
+| Path | Action | Tier |
+| --- | --- | --- |
+| `evals/lightweight_audit/parent_controller.py` | delete | C — never tracked |
+| `evals/lightweight_audit/runner.py` | rewrite | C now, B after rewrite |
+| `evals/lightweight_audit/cases.json` | keep | B |
+| `evals/lightweight_audit/source_coverage.json` | keep, byte-unchanged | B |
+| `docs/audits/CANARY_RUNBOOK.md` | delete | C — never tracked |
+| `docs/audits/LIGHTWEIGHT_SHADOW_ROUTE.md` | rewrite | C now, B after rewrite |
+| `docs/audits/RESULTS_SCHEMA.md` | rewrite | C now, B after rewrite |
+| `docs/audits/DELETE_OR_KEEP_TABLE.md` | keep as is | B |
+| `tests/test_lightweight_audit.py` | rewrite | C now, B after rewrite |
+| `implementation-notes.md` | keep and append only | A |
+
+The instruction packet is a local-only input in tier C. It is added to
+`.gitignore` in this phase so that tracking it is prevented deterministically
+rather than by care.
