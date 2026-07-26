@@ -1,4 +1,4 @@
-"""In-memory observational events with deterministic serialization."""
+"""Build in-memory observational events with deterministic serialization."""
 
 from __future__ import annotations
 

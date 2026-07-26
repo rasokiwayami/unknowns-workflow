@@ -1,4 +1,8 @@
-"""Append-only, non-authoritative evidence records under an explicit root."""
+"""Append-only, non-authoritative evidence records under an explicit root.
+
+Exact built-in type checks are deliberate at closed event boundaries; they
+reject subclasses and preserve the input contract.
+"""
 
 from __future__ import annotations
 

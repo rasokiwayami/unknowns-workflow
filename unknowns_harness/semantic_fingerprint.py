@@ -1,4 +1,8 @@
-"""Deterministic fingerprints for explicitly named public inputs."""
+"""Deterministic fingerprints for explicitly named public inputs.
+
+Exact built-in type checks are deliberate for closed artifact name and content
+inputs; they reject subclasses where the public contract requires exact types.
+"""
 
 from __future__ import annotations
 

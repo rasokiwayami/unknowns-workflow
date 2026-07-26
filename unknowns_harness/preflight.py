@@ -1,4 +1,4 @@
-"""Deterministic, non-authoritative capability checks."""
+"""Deterministic, non-authoritative checks for declared capabilities."""
 
 from __future__ import annotations
 

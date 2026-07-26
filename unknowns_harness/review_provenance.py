@@ -1,4 +1,4 @@
-"""Pure validation for an optional review-provenance record."""
+"""Pure validation for an optional caller-supplied review record."""
 
 from __future__ import annotations
 
