@@ -120,8 +120,51 @@ Use only the files that fit the operation.
 
 ## Installation
 
-Copy any skill folder from `skills/` into your agent's skill directory, or
-reference the skill text directly in your workflow prompts.
+### Local Plugin Marketplace
+
+The repository can be installed as one local plugin that bundles all eight
+skills. Clone or otherwise place the repository at a stable local path, then
+run this from its root:
+
+```bash
+codex plugin marketplace add .
+codex plugin add unknowns-workflow@unknowns-workflow-local
+```
+
+Restart the ChatGPT desktop app after registering the marketplace. You can also
+open **Plugins**, select **Unknowns Workflow Local**, and install
+`unknowns-workflow` there. Start a new task after installation so Codex can
+discover the bundled skills, then invoke one explicitly when needed:
+
+```text
+$finding-unknowns
+```
+
+To update a local checkout and reinstall the cached plugin:
+
+```bash
+git pull
+codex plugin marketplace upgrade unknowns-workflow-local
+codex plugin add unknowns-workflow@unknowns-workflow-local
+```
+
+If you move the checkout, remove the stale marketplace registration and add
+the new repository path before reinstalling:
+
+```bash
+codex plugin marketplace remove unknowns-workflow-local
+codex plugin marketplace add /new/path/to/unknowns-workflow
+codex plugin add unknowns-workflow@unknowns-workflow-local
+```
+
+The marketplace is local-only. It does not publish the plugin or register it
+in the public Plugins Directory.
+
+### Direct Skill Installation
+
+For a lighter-weight setup, copy any skill folder from `skills/` into your
+agent's skill directory, or reference the skill text directly in your workflow
+prompts.
 
 For agent skill directories that use a named folder layout, the structure is:
 
