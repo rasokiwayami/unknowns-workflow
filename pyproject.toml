@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "unknowns-workflow-harness"
+version = "0.1.0"
+description = "A non-authoritative local harness for Unknowns Workflow checks."
+requires-python = ">=3.10"
+license = "MIT"
+
+[project.scripts]
+unknowns-harness = "unknowns_harness.cli:main"
+workflow = "unknowns_harness.workflow_cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["unknowns_harness*"]

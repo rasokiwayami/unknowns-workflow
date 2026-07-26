@@ -34,6 +34,13 @@ Require:
 - it contains `## Deviations`;
 - each deviation has expected, found, chosen option, reason, and follow-up.
 
+An optional provenance check can bind a review record to the immutable artifact
+being gated, constrain it to caller-approved review routes, require reviewer
+independence, and reject an approving verdict with unresolved blocking
+findings. The caller supplies the artifact identity and route list; the check
+does not resolve repository state or grant authority. See the
+[proportional review contract](review-contract.md).
+
 ## Learning Gate
 
 Only when learning is an explicit goal:

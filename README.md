@@ -174,6 +174,67 @@ skills/
     SKILL.md
 ```
 
+### What predates the harness
+
+Before the harness implementation, this repository already contained the eight
+Unknowns skills listed above, six reusable templates, and the public
+documentation for running the workflow manually. Those remain usable without
+installing Python code.
+
+### What the harness adds
+
+The harness adds the installable `unknowns_harness` Python package and its local
+test suite. The package provides:
+
+- capability preflight and typed rejections;
+- structured telemetry and deterministic semantic fingerprints;
+- a durable, non-authoritative evidence graph;
+- a consultation budget keyed by blocker, evidence, and attempt fingerprints;
+- the `workflow` CLI with `typed-rejection` and `adjudication` deterministic
+  demos.
+
+The harness is for local observation and demonstration only. It does not
+authorize effects, issue tokens or permissions, perform external actions, or
+transfer authority.
+
+### Harness quickstart
+
+From a fresh clone, create an isolated environment and install the package:
+
+```bash
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install .
+```
+
+Run the typed-rejection demo with an explicit local runtime root:
+
+```bash
+workflow typed-rejection \
+  --assets-root . \
+  --runtime-root .agent/demo-runtime/typed-rejection
+```
+
+This intentionally exits with status `2`. Its single JSON line reports
+`status: "rejected"` and a `missing_capability` rejection for
+`bounded_local_dispatch`; it stops after preflight and performs no dispatch.
+
+Run the successful adjudication demo with a separate local runtime root:
+
+```bash
+workflow adjudication \
+  --assets-root . \
+  --runtime-root .agent/demo-runtime/adjudication
+```
+
+This exits with status `0`. Its single JSON line reports
+`status: "completed"`, four comparable exposures, two agreements, and one
+disagreement in each direction. The recorded dispatch remains
+`executed: false`.
+
+The lower-level capability preflight remains available as
+`unknowns-harness preflight`.
+
 ## Copy-Paste Prompt
 
 Use this when you want an agent to apply the workflow without installing the
@@ -215,10 +276,14 @@ The workflow works manually, but teams can automate it:
 
 These gates are optional. The portable workflow is the habit: classify
 unknowns, resolve what matters, log deviations, and teach the result.
+Reviews can use the [proportional review contract](docs/review-contract.md) and
+its optional immutable-artifact provenance check.
 
 ## Status
 
-Initial public extraction. No CLI is included in this first slice.
+The original portable skills, templates, and manual workflow are accompanied
+by an installable, tested local harness with deterministic preflight and
+workflow demos. Harness results remain non-authoritative local observations.
 
 ## License
 

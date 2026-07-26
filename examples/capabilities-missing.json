@@ -1,0 +1,6 @@
+{
+  "capabilities": {
+    "ledger": true,
+    "implementation_notes": false
+  }
+}
