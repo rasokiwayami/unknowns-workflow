@@ -1,5 +1,8 @@
 """Append-only, non-authoritative evidence records under an explicit root.
 
+This module handles path safety, canonical encoding, event schema validation,
+file locking, and exposure adjudication.
+
 Exact built-in type checks are deliberate at closed event boundaries; they
 reject subclasses and preserve the input contract.
 """
@@ -128,6 +131,33 @@ def _dedup_key(event: Mapping[str, object]) -> str:
     return hashlib.sha256(_canonical(identity)).hexdigest()
 
 
+def _check_kind_decision_shape(
+    kind: object,
+    decision: object,
+    baseline_decision: object,
+    shadow_decision: object,
+) -> None:
+    if kind == "observation":
+        if any(
+            value is not None
+            for value in (decision, baseline_decision, shadow_decision)
+        ):
+            raise EvidenceGraphError("schema_invalid")
+    elif kind == "decision":
+        if (
+            decision not in DECISIONS
+            or baseline_decision is not None
+            or shadow_decision is not None
+        ):
+            raise EvidenceGraphError("decision_closed")
+    elif (
+        decision is not None
+        or baseline_decision not in DECISIONS
+        or shadow_decision not in DECISIONS
+    ):
+        raise EvidenceGraphError("decision_closed")
+
+
 def _validate_event(
     event: Mapping[str, object],
     *,
@@ -169,21 +199,12 @@ def _validate_event(
     for field in ("decision", "baseline_decision", "shadow_decision"):
         if event[field] is not None and type(event[field]) is not str:
             raise EvidenceGraphError("schema_invalid")
-    kind = event["kind"]
-    if kind == "observation":
-        if any(event[field] is not None for field in ("decision", "baseline_decision", "shadow_decision")):
-            raise EvidenceGraphError("schema_invalid")
-    elif kind == "decision":
-        if event["decision"] not in DECISIONS or any(
-            event[field] is not None for field in ("baseline_decision", "shadow_decision")
-        ):
-            raise EvidenceGraphError("decision_closed")
-    elif (
-        event["decision"] is not None
-        or event["baseline_decision"] not in DECISIONS
-        or event["shadow_decision"] not in DECISIONS
-    ):
-        raise EvidenceGraphError("decision_closed")
+    _check_kind_decision_shape(
+        event["kind"],
+        event["decision"],
+        event["baseline_decision"],
+        event["shadow_decision"],
+    )
     if event["dedup_key"] != _dedup_key(event):
         raise EvidenceGraphError("dedup_key_mismatch")
     if any(item["event_id"] == event["event_id"] for item in previous):
@@ -292,22 +313,9 @@ def append_event(
     for value in (decision, baseline_decision, shadow_decision):
         if value is not None and type(value) is not str:
             raise EvidenceGraphError("schema_invalid")
-    if kind == "observation" and any(
-        value is not None for value in (decision, baseline_decision, shadow_decision)
-    ):
-        raise EvidenceGraphError("schema_invalid")
-    if kind == "decision" and (
-        decision not in DECISIONS
-        or baseline_decision is not None
-        or shadow_decision is not None
-    ):
-        raise EvidenceGraphError("decision_closed")
-    if kind == "comparable_exposure" and (
-        decision is not None
-        or baseline_decision not in DECISIONS
-        or shadow_decision not in DECISIONS
-    ):
-        raise EvidenceGraphError("decision_closed")
+    _check_kind_decision_shape(
+        kind, decision, baseline_decision, shadow_decision
+    )
     produced = datetime.now(timezone.utc) if produced_at is None else _parse_time(produced_at)
     if produced > datetime.now(timezone.utc):
         raise EvidenceGraphError("future_event")
