@@ -20,6 +20,35 @@ Most agent failures are not only coding failures. They are failures to notice
 that the agent was operating with the wrong map: missing domain context,
 implicit taste, unasked architecture questions, or hidden codebase constraints.
 
+## Copy-Paste Prompt
+
+Use this when you want an agent to apply the workflow without installing the
+skills first:
+
+```text
+Before implementing, run an unknowns pass.
+
+Classify the work into:
+- Known Knowns
+- Known Unknowns
+- Unknown Knowns
+- Unknown Unknowns
+
+Declare familiarity as new, partial, or known. If the area is unfamiliar,
+teach me the likely blindspots before planning. If the success criteria are
+implicit, give me a few concrete options to react to before editing code. If
+named decisions remain, ask only the questions that would change architecture,
+scope, or user-visible behavior.
+
+During implementation, keep implementation notes. If the real codebase forces
+you to deviate from the plan, choose the conservative option and log:
+- Expected
+- Found
+- Chosen conservative option
+- Why conservative
+- Follow-up needed
+```
+
 ## The 4-Way Split
 
 Use these labels before implementation:
@@ -233,36 +262,13 @@ disagreement in each direction. The recorded dispatch remains
 `executed: false`.
 
 The lower-level capability preflight remains available as
-`unknowns-harness preflight`.
+`unknowns-harness preflight`. For a capability preflight check, use
+`examples/capabilities-missing.json` as a sample manifest with
+`unknowns-harness preflight --manifest examples/capabilities-missing.json
+--require ledger`.
 
-## Copy-Paste Prompt
-
-Use this when you want an agent to apply the workflow without installing the
-skills first:
-
-```text
-Before implementing, run an unknowns pass.
-
-Classify the work into:
-- Known Knowns
-- Known Unknowns
-- Unknown Knowns
-- Unknown Unknowns
-
-Declare familiarity as new, partial, or known. If the area is unfamiliar,
-teach me the likely blindspots before planning. If the success criteria are
-implicit, give me a few concrete options to react to before editing code. If
-named decisions remain, ask only the questions that would change architecture,
-scope, or user-visible behavior.
-
-During implementation, keep implementation notes. If the real codebase forces
-you to deviate from the plan, choose the conservative option and log:
-- Expected
-- Found
-- Chosen conservative option
-- Why conservative
-- Follow-up needed
-```
+The `workflow` module and console script require POSIX `fcntl`; the preflight
+and review commands remain cross-platform.
 
 ## Optional Automation Gates
 
@@ -278,6 +284,17 @@ These gates are optional. The portable workflow is the habit: classify
 unknowns, resolve what matters, log deviations, and teach the result.
 Reviews can use the [proportional review contract](docs/review-contract.md) and
 its optional immutable-artifact provenance check.
+
+## Documentation
+
+- [Architecture](docs/architecture.md) — entrypoints, module map, boundaries,
+  platforms, tests, and growth seams.
+- [Workflow](docs/workflow.md) — the portable workflow in detail.
+- [Examples](docs/examples.md) — example artifacts and usage.
+- [Automation gates](docs/gates.md) — optional checks and review hooks.
+- [Review contract](docs/review-contract.md) — proportional review guidance.
+- [Project notes](docs/project-notes.md) — scope and design notes.
+- [日本語の紹介](docs/ja.md) — Japanese overview.
 
 ## Status
 
