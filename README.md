@@ -289,6 +289,7 @@ its optional immutable-artifact provenance check.
 
 - [Architecture](docs/architecture.md) — entrypoints, module map, boundaries,
   platforms, tests, and growth seams.
+- [Contributing](CONTRIBUTING.md) — verification and contribution guidance.
 - [Workflow](docs/workflow.md) — the portable workflow in detail.
 - [Examples](docs/examples.md) — example artifacts and usage.
 - [Automation gates](docs/gates.md) — optional checks and review hooks.
