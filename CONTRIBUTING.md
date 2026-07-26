@@ -18,6 +18,9 @@ git diff --check
 Public-facing changes receive independent review before push. Changes to the
 skills or templates are contract changes and need a discussion before editing.
 
+`tests/golden/` pins the public CLI output; regenerating it is a contract change requiring a decision.
+`tests/test_docs_consistency.py` fails if a new document or skill is not linked from the README.
+
 See [AGENTS.md](AGENTS.md) for repository rules and
 [docs/architecture.md](docs/architecture.md) for the module map, platform
 boundary, and test coverage.
