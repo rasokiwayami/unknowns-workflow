@@ -8,7 +8,8 @@ for agent-assisted implementation.
 - Installable skill folders live under `skills/`.
 - Reusable artifact templates live under `templates/`.
 - Public workflow explanation lives under `docs/` and `README.md`.
-- No CLI is included in the initial release.
+- An optional local harness ships the `unknowns-harness` and `workflow` CLI
+  scripts; the portable workflow still works without Python.
 
 ## Design Choices
 
