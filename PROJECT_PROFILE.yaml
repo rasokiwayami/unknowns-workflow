@@ -17,8 +17,10 @@ authority:
 
 verification:
   default:
+    - python3 -m unittest discover -s tests -q
+    - python3 -m json.tool .agents/plugins/marketplace.json >/dev/null
+    - python3 -m json.tool .codex-plugin/plugin.json >/dev/null
     - git diff --check
-    - find . -type f -not -path './.git/*' -maxdepth 4 -print
 
 layout:
   skills: skills/

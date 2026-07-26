@@ -1,4 +1,4 @@
-"""Deterministic, non-authoritative Unknowns Workflow demonstrations."""
+"""Run deterministic, non-authoritative Unknowns Workflow demonstrations."""
 
 from __future__ import annotations
 

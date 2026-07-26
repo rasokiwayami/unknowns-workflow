@@ -1,4 +1,4 @@
-"""Command-line entrypoint for local harness checks."""
+"""Command-line entrypoint for capability and review-provenance checks."""
 
 from __future__ import annotations
 

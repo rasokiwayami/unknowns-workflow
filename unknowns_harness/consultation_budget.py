@@ -1,4 +1,8 @@
-"""Pure, non-authoritative consultation budget decisions."""
+"""Pure, non-authoritative consultation budget decisions.
+
+Exact built-in type checks are deliberate at closed string and record
+boundaries; they reject subclasses and preserve the input contract.
+"""
 
 from __future__ import annotations
 

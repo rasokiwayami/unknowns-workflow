@@ -1,4 +1,4 @@
-"""Console entrypoint for deterministic Unknowns Workflow demos."""
+"""Console entrypoint for deterministic workflow demonstrations."""
 
 from __future__ import annotations
 

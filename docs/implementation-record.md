@@ -1,3 +1,6 @@
+> This is the frozen historical record of how the harness was built and reviewed.
+> It is not user documentation and is not maintained going forward.
+
 # Unknowns Workflow Harness — Implementation Record
 
 ## Goal
