@@ -295,6 +295,8 @@ its optional immutable-artifact provenance check.
 - [Review contract](docs/review-contract.md) — proportional review guidance.
 - [Project notes](docs/project-notes.md) — scope and design notes.
 - [日本語の紹介](docs/ja.md) — Japanese overview.
+- [Implementation record](docs/implementation-record.md) — frozen historical
+  build and review record.
 
 ## Status
 
