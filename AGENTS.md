@@ -1,4 +1,4 @@
-# AGENTS.md - unknowns-workflow
+# unknowns-workflow/AGENTS.md
 
 This repository packages the Unknowns Workflow as portable agent skills and
 templates for agent-assisted implementation.
